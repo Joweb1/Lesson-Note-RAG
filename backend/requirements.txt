@@ -1,0 +1,17 @@
+Flask
+Flask-RESTful
+Flask-Cors
+gunicorn
+mysql-connector-python
+SQLAlchemy
+chromadb
+sentence-transformers
+pypdf2
+python-docx
+pydub
+google-generativeai
+httpx
+python-dotenv
+werkzeug
+pytest
+requests

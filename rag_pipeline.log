@@ -1,0 +1,21 @@
+2025-09-15 00:24:16,698 INFO Processing PDF: uploads/lessons/2/LenitAI_Whitepaper.pdf
+2025-09-15 00:24:27,576 WARNING JSON parsing failed: Invalid control character at: line 10 column 245 (char 877). Raw text: '```json
+{
+  "title": "LenitAI: An AI-Powered Education Platform",
+  "summary": "LenitAI is an AI-driven platform designe...'
+2025-09-15 00:24:52,872 INFO Processing audio: uploads/lessons/2/lenitAI-podcast.mp3.wav
+2025-09-15 00:26:08,345 INFO Processing PDF: uploads/lessons/2/LenitAI_Whitepaper.pdf
+2025-09-15 00:26:19,576 WARNING JSON parsing failed: Invalid \escape: line 10 column 367 (char 1087). Raw text: '```json
+{
+  "title": "LenitAI: The Future of EdTech",
+  "summary": "LenitAI is an AI-powered EdTech platform transformin...'
+2025-09-15 00:36:42,849 INFO Processing PDF: uploads/lessons/2/LenitAI_Whitepaper.pdf
+2025-09-15 00:36:59,543 INFO Processing audio: uploads/lessons/2/lenitAI-podcast.mp3.wav
+2025-09-15 01:10:05,286 INFO Processing audio: uploads/lessons/1/download_4.wav
+2025-09-15 01:11:05,087 WARNING Gemini answer generation failed for full context: Event loop is closed. Trying DeepSeek.
+2025-09-15 01:15:59,342 WARNING Gemini answer generation failed for full context: Event loop is closed. Trying DeepSeek.
+2025-09-15 01:34:05,356 WARNING Gemini answer generation failed for full context: Event loop is closed. Trying DeepSeek.
+2025-09-15 01:36:14,459 INFO Processing PDF: uploads/lessons/3/jovibe_code_pitchdeck_cover_2.pdf
+2025-09-15 01:36:19,137 INFO Processing PDF: uploads/lessons/3/ICT_Training_Business_Pitch_Visual.pdf
+2025-09-15 01:36:28,793 INFO Processing audio: uploads/lessons/3/download_2.wav
+2025-09-15 01:37:48,815 WARNING Gemini answer generation failed for full context: Event loop is closed. Trying DeepSeek.

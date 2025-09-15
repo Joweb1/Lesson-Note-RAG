@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Lesson Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+    <link rel="stylesheet" href="ui.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Main container -->
+    <div id="app" class="h-screen flex flex-col">
+
+        <!-- Header -->
+        <header class="bg-white shadow-md p-4 flex justify-between items-center z-10">
+            <h1 class="text-2xl font-bold text-gray-800">AI Lesson Generator</h1>
+            <button id="new-lesson-btn" class="bg-purple-600 text-white px-4 py-2 rounded-2xl hover:bg-purple-700 transition">+ New Lesson</button>
+        </header>
+
+        <!-- Content Area -->
+        <main class="flex-grow p-4 overflow-y-auto pb-16">
+            <!-- Highlights Screen -->
+            <div id="highlights-screen" class="screen active">
+                <div id="lessons-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+
+            <!-- Workspace Screen -->
+            <div id="workspace-screen" class="screen hidden">
+                <div class="flex flex-col h-full">
+                    <div class="flex justify-between items-center mb-4">
+                        <input id="lesson-title-input" type="text" class="text-3xl font-bold p-2 border-b-2 border-gray-300 focus:outline-none focus:border-purple-500 w-full" placeholder="Lesson Title">
+                        <div>
+                            <button id="edit-lesson-btn" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-2xl hover:bg-gray-300 transition ml-2">Edit</button>
+                            <button id="save-lesson-btn" class="bg-purple-600 text-white px-4 py-2 rounded-2xl hover:bg-purple-700 transition ml-2 hidden">Save</button>
+                        </div>
+                    </div>
+                    
+                    <div id="lesson-content-view" class="prose max-w-none p-4 border rounded-2xl bg-white"></div>
+                    <textarea id="lesson-content-textarea" class="p-4 border rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 hidden" placeholder="Lesson content will appear here..."></textarea>
+                    
+                    <div class="mt-4 flex items-center">
+                        <input id="generate-prompt-input" type="text" class="flex-grow p-2 border rounded-l-2xl focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Enter a prompt to generate or edit the lesson...">
+                        <button id="generate-btn" class="bg-purple-600 text-white p-2 rounded-r-2xl hover:bg-purple-700 transition"><span class="material-icons">send</span></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sources Screen -->
+            <div id="sources-screen" class="screen hidden">
+                <div id="sources-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                <button id="generate-full-lesson-btn" class="fixed bottom-24 right-24 bg-blue-600 text-white rounded-full p-4 shadow-lg hover:bg-blue-700 transition"><span class="material-icons">auto_awesome</span></button>
+                <button id="add-source-btn" class="fixed bottom-24 right-8 bg-purple-600 text-white rounded-full p-4 shadow-lg hover:bg-purple-700 transition"><span class="material-icons">add</span></button>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bg-white shadow-t-md flex justify-around p-2 fixed bottom-0 w-full">
+            <button data-screen="highlights-screen" class="nav-btn text-purple-600">
+                <span class="material-icons">lightbulb</span>
+                <span class="text-xs">Highlights</span>
+            </button>
+            <button data-screen="workspace-screen" class="nav-btn text-gray-500">
+                <span class="material-icons">edit_document</span>
+                <span class="text-xs">Workspace</span>
+            </button>
+            <button data-screen="sources-screen" class="nav-btn text-gray-500">
+                <span class="material-icons">folder</span>
+                <span class="text-xs">Sources</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="loader"></div>
+        <p class="ml-4 text-lg">Generating lesson...</p>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-4">Upload Sources</h2>
+            <input type="file" id="file-input" multiple class="w-full border p-2 rounded-lg">
+            <div id="upload-progress-container" class="mt-4"></div>
+            <div class="mt-4 flex justify-end">
+                <button id="cancel-upload-btn" class="text-gray-600 mr-4">Cancel</button>
+                <button id="start-upload-btn" class="bg-purple-600 text-white px-4 py-2 rounded-2xl">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
