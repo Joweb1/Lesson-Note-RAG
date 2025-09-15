@@ -1,108 +1,126 @@
+# AI Lesson Note Generator (RAG)
 
-# AI Lesson Generator
+A full-stack web application that allows educators to generate comprehensive lesson notes from various source materials (PDFs, DOCX, audio, images) using a Retrieval-Augmented Generation (RAG) pipeline.
 
-This is a single-page Flask web application that uses a Retrieval-Augmented Generation (RAG) pipeline to create AI-generated lesson notes from uploaded PDF, DOCX, audio, and image sources.
+This application provides a single-page app (SPA) experience for creating lessons, uploading source materials, ingesting them into a vector database, and generating detailed, editable lesson plans using large language models.
 
-## Features
+## Key Features
 
-- Create, manage, and delete lessons.
-- Upload multiple source files (PDF, DOCX, audio, images) for each lesson.
-- Ingest sources into a vector database (ChromaDB).
-- Generate and edit lesson content using a large language model (Gemini or DeepSeek).
-- Single-page application (SPA) feel with a modern UI.
+- **Lesson Management**: Create, list, update, and delete lessons.
+- **Multi-format Source Upload**: Upload sources in various formats including PDF, DOCX, MP3, WAV, and plain text.
+- **AJAX Uploads with Progress**: Files are uploaded asynchronously with a visual progress bar.
+- **Per-Lesson Data Silos**: Each lesson has its own dedicated vector collection (using ChromaDB), ensuring content remains isolated.
+- **RAG-based Content Generation**:
+    - **Targeted Generation**: Use a simple prompt to generate or refine specific parts of a lesson note.
+    - **Full Lesson Generation**: A dedicated button synthesizes *all* ingested content for a lesson into a complete, well-structured lesson plan based on a comprehensive prompt.
+- **Markdown Editor**: Lesson notes are rendered from Markdown in a "view mode" and can be edited in a raw Markdown "edit mode".
+- **API-driven Backend**: A robust Flask backend provides a full suite of API endpoints for all frontend functionality.
+
+## How It Works: The RAG Pipeline
+
+The application's core is a Retrieval-Augmented Generation pipeline:
+
+1.  **Upload**: A user uploads source files (e.g., a PDF textbook chapter, a lecture audio). The files are stored and associated with a specific lesson.
+2.  **Ingestion**: When ingestion is triggered, the backend processes each file:
+    - It extracts raw text (from PDFs, DOCX), transcribes audio, or performs OCR on images.
+    - The extracted text is split into smaller, manageable chunks.
+    - These chunks are converted into vector embeddings (numerical representations) using a sentence-transformer model.
+    - The embeddings are stored in a lesson-specific ChromaDB collection.
+3.  **Generation (Retrieval + Augmentation)**:
+    - When a user requests a lesson note, a prompt is created.
+    - For targeted generation, the system searches the vector database for the most relevant chunks of information related to the user's prompt.
+    - For full lesson generation, the system retrieves *all* chunks of information.
+    - This retrieved content (the "context") is combined with the user's prompt and sent to a Large Language Model (like Google Gemini).
+    - The LLM generates the lesson note based on the rich context provided, and the result is saved and displayed to the user.
 
 ## Tech Stack
 
-- **Backend**: Flask, Gunicorn, SQLAlchemy, MariaDB/MySQL
-- **Frontend**: HTML, Tailwind CSS, vanilla JavaScript
-- **Vector Database**: ChromaDB
-- **RAG Pipeline**: `google-generativeai`, `sentence-transformers`, `pypdf2`, `python-docx`, `pydub`
-- **Containerization**: Docker, Docker Compose
+- **Backend**: Python, Flask, SQLAlchemy
+- **Database**: MariaDB / MySQL
+- **Vector Database**: ChromaDB (local persistent storage)
+- **RAG & AI**: `google-generativeai`, `sentence-transformers`, `langchain` (for text splitting)
+- **Frontend**: Vanilla JavaScript (ES6), Tailwind CSS, Marked.js (for Markdown rendering)
+- **Deployment**: Docker & Docker Compose (optional, for containerized setup)
 
-## Setup and Running the Application
+---
 
-### Prerequisites
+## Installation and Setup
 
+You can run this project either locally on your machine or using Docker.
+
+### Method 1: Local Machine Setup (Recommended)
+
+**Prerequisites:**
+- Python 3.9+
+- A running MariaDB or MySQL server
+- `ffmpeg` for audio processing (`pkg install ffmpeg` on Termux, `brew install ffmpeg` on macOS, `sudo apt-get install ffmpeg` on Debian/Ubuntu)
+
+**1. Clone & Setup Environment:**
+   - Create a `.env` file from the example: `cp .env.example .env`
+   - Edit the `.env` file:
+     - Add your `GEMINI_API_KEY`.
+     - Set `DATABASE_URL` to point to your local database. Example:
+       ```
+       DATABASE_URL="mysql+mysqlconnector://YOUR_USER:YOUR_PASSWORD@127.0.0.1:3306/lesson_generator"
+       ```
+
+**2. Setup Database:**
+   - Log into your MySQL/MariaDB server as a root/admin user.
+   - Create the database and grant permissions:
+     ```sql
+     CREATE DATABASE lesson_generator;
+     GRANT ALL PRIVILEGES ON lesson_generator.* TO 'YOUR_USER'@'localhost';
+     FLUSH PRIVILEGES;
+     ```
+
+**3. Install Dependencies & Run:**
+   - Install Python packages:
+     ```bash
+     pip install -r backend/requirements.txt
+     ```
+   - Run the Flask application:
+     ```bash
+     python backend/app.py
+     ```
+
+**4. Access the App:**
+   - Open your browser and go to `http://localhost:8000`.
+
+### Method 2: Docker Setup
+
+**Prerequisites:**
 - Docker
-- Docker Compose
+- Docker Compose (v2, i.e., `docker compose`)
 
-### 1. Clone the repository
+**1. Setup Environment:**
+   - Create a `.env` file from the example: `cp .env.example .env`
+   - Edit the `.env` file with your `GEMINI_API_KEY` and any desired changes to the default MySQL credentials.
 
-```bash
-# This step is not needed as you are already in the project directory
-```
+**2. Build and Run Containers:**
+   ```bash
+   docker compose up --build -d
+   ```
 
-### 2. Configure Environment Variables
+**3. Access the App:**
+   - Open your browser and go to `http://localhost:8000`.
+   - The database will be running in a container and accessible to the Flask app at the hostname `db`.
 
-Create a `.env` file by copying the example file:
+---
 
-```bash
-cp .env.example .env
-```
+## API Endpoints
 
-Now, edit the `.env` file and add your API keys for Gemini and/or DeepSeek. You can also change the database credentials if needed.
+All endpoints are prefixed with `/api`.
 
-```
-GEMINI_API_KEY="your_gemini_api_key"
-DEEPSEEK_API_KEY="your_deepseek_api_key"
-
-MYSQL_HOST="db"
-MYSQL_USER="user"
-MYSQL_PASSWORD="password"
-MYSQL_DATABASE="lesson_generator"
-```
-
-### 3. Build and Run with Docker Compose
-
-From the project root directory, run:
-
-```bash
-docker-compose up --build
-```
-
-This will build the Docker image for the Flask application and start the `web` and `db` services.
-
-The application will be accessible at [http://localhost:8000](http://localhost:8000).
-
-### 4. Running Tests
-
-To run the backend tests, you can exec into the running `web` container:
-
-```bash
-docker-compose exec web pytest
-```
-
-**Note**: The `test_generate` test is skipped by default as it makes a live call to the LLM API and requires API keys to be set.
-
-## How to Use
-
-1.  **Create a new lesson**: Click the "+ New Lesson" button and enter a title.
-2.  **Open a lesson**: Click on a lesson card in the "Highlights" screen.
-3.  **Upload sources**: In the "Sources" screen, click the floating action button to open the upload modal. Select your files and click "Upload".
-4.  **Ingest sources**: After uploading, an "Ingest Sources" button will appear. Click it to start the ingestion process.
-5.  **Generate content**: In the "Workspace" screen, enter a prompt in the input field at the bottom and click the send button. The AI will generate content based on your prompt and the ingested sources.
-6.  **Edit content**: You can directly edit the title and content in the "Workspace". The changes are saved automatically when you click away from the input field or textarea.
-
-## Project Structure
-
-```
-project-root/
-├─ backend/             # Flask backend
-│  ├─ app.py            # Flask app, routes
-│  ├─ rag_pipeline.py   # RAG code
-│  ├─ models.py         # SQLAlchemy models
-│  ├─ db.py             # DB session setup
-│  ├─ chroma_adapter.py # ChromaDB manager
-│  ├─ storage.py        # File storage helpers
-│  ├─ requirements.txt
-│  └─ tests/            # Pytest tests
-├─ frontend/            # Frontend files
-│  ├─ index.html
-│  ├─ main.js
-│  ├─ ui.css
-├─ uploads/             # Persistent file storage
-├─ chroma_db/           # Persistent folder for chromadb
-├─ .env.example
-├─ Dockerfile
-└─ docker-compose.yml
-```
+| Method | Endpoint                             | Description                                         |
+|--------|--------------------------------------|-----------------------------------------------------|
+| GET    | `/lessons`                           | Get a list of all lessons.                          |
+| POST   | `/lessons`                           | Create a new lesson.                                |
+| GET    | `/lessons/<id>`                      | Get full details for a single lesson.               |
+| PUT    | `/lessons/<id>`                      | Update a lesson's title or content.                 |
+| DELETE | `/lessons/<id>`                      | Delete a lesson and all its associated data.        |
+| GET    | `/lessons/<id>/sources`              | Get a list of uploaded sources for a lesson.        |
+| POST   | `/lessons/<id>/sources`              | Upload a new source file.                           |
+| DELETE | `/lessons/<id>/sources/<source_id>`  | Delete a source file.                               |
+| POST   | `/lessons/<id>/ingest`               | Trigger the ingestion process for uploaded sources. |
+| POST   | `/lessons/<id>/generate`             | Generate/refine content with a simple prompt.       |
+| POST   | `/lessons/<id>/generate-full`        | Generate a full lesson from all ingested content.   |
